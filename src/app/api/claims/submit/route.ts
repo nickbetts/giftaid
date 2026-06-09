@@ -14,8 +14,16 @@ export async function POST(request: NextRequest) {
   }
 
   const charity = await getOrCreateDefaultCharity();
+
+  // Fetch claim with eligible donation rows for XML construction
   const claim = await prisma.claim.findFirst({
     where: { id: claimId, charityId: charity.id },
+    include: {
+      claimItems: {
+        where: { isEligible: true },
+        include: { claim: false },
+      },
+    },
   });
 
   if (!claim) {
@@ -26,9 +34,46 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Only ready claims can be submitted." }, { status: 400 });
   }
 
+  if (!charity.hmrcReference) {
+    return NextResponse.json(
+      { error: "Charity HMRC reference is not configured. Set DEFAULT_CHARITY_HMRC_REFERENCE." },
+      { status: 422 },
+    );
+  }
+
+  // Load donation rows for the eligible claim items
+  const eligibleRowIds = claim.claimItems.map((item) => item.donationRowId);
+  const donationRows = await prisma.donationRow.findMany({
+    where: { id: { in: eligibleRowIds } },
+  });
+
+  if (donationRows.length === 0) {
+    return NextResponse.json(
+      { error: "No eligible donation rows found for this claim." },
+      { status: 422 },
+    );
+  }
+
   const hmrcResponse = await submitClaimToHmrc({
     claimReference: claim.claimReference,
-    estimatedAidPence: claim.estimatedAidPence,
+    taxYear: claim.taxYear,
+    charity: {
+      hmrcReference: charity.hmrcReference,
+      authorisedOfficialTitle: process.env.HMRC_OFFICIAL_TITLE ?? "Mr",
+      authorisedOfficialForename: process.env.HMRC_OFFICIAL_FORENAME ?? "Admin",
+      authorisedOfficialSurname: process.env.HMRC_OFFICIAL_SURNAME ?? "User",
+      authorisedOfficialPhone: process.env.HMRC_OFFICIAL_PHONE ?? "01234567890",
+      contactEmail: process.env.HMRC_CONTACT_EMAIL ?? "admin@example.com",
+    },
+    donations: donationRows.map((row) => ({
+      donorTitle: row.donorTitle,
+      donorFirstName: row.donorFirstName ?? "Unknown",
+      donorLastName: row.donorLastName ?? "Unknown",
+      donorHouseNameOrNumber: row.donorHouseNameOrNumber,
+      donorPostcode: row.donorPostcode ?? "",
+      donationDate: row.donationDate,
+      grossAmountPence: row.grossAmountPence,
+    })),
   });
 
   const updatedClaim = await prisma.claim.update({
