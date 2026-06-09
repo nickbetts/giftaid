@@ -13,7 +13,7 @@ export default function FreeCheckPage() {
   return (
     <div className="flex flex-1 flex-col">
       <SiteHeader />
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-10 px-5 pb-20 pt-8 md:px-10">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-5 pb-20 pt-8 md:px-10">
         <section className="relative overflow-hidden rounded-3xl border border-teal-900/10 bg-surface/90 p-8 shadow-xl shadow-teal-950/10 md:p-12">
           <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-sky-300/30 blur-3xl" />
           <div className="absolute -bottom-16 left-8 h-48 w-48 rounded-full bg-emerald-300/30 blur-3xl" />

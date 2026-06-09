@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { GivtaLogo } from "@/components/givta-logo";
 import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
@@ -35,15 +35,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-teal-50/60 via-white to-sky-50/60 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <Link href="/">
-            <Image src="/givta.svg" alt="givta" width={140} height={76} className="h-12 w-auto" priority />
+            <GivtaLogo height={52} className="w-auto" />
           </Link>
-          <Image src="/undraw_security-on_3ykb.svg" alt="" width={180} height={120} className="mt-6 h-28 w-auto" aria-hidden />
-          <h1 className="mt-5 text-2xl font-semibold text-slate-900">Welcome back</h1>
-          <p className="mt-2 text-sm text-slate-600">Sign in to your charity workspace</p>
+          <h1 className="mt-8 text-2xl font-semibold text-slate-900">Welcome back</h1>
+          <p className="mt-2 text-sm text-slate-500">Sign in to your charity workspace</p>
         </div>
 
         <form

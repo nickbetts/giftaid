@@ -96,7 +96,7 @@ export default function Home() {
               </div>
             </div>
             <div className="rounded-2xl border border-brand/20 bg-brand-deep p-6 text-white shadow-lg shadow-brand-deep/30">
-              <Image src="/givta.svg" alt="givta logo" width={160} height={87} className="h-auto w-32" priority />
+              <Image src="/givta.svg" alt="givta logo" width={200} height={109} className="h-auto w-36" priority />
               <Image src="/undraw_gift-joy_kqz4.svg" alt="" width={220} height={145} className="mt-5 h-32 w-auto opacity-90" aria-hidden />
               <p className="mt-4 text-sm font-semibold uppercase tracking-wider text-teal-200">Why teams switch</p>
               <p className="mt-3 text-2xl font-semibold">They stop wrestling spreadsheets and start recovering income faster.</p>

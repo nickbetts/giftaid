@@ -76,7 +76,6 @@ export default function CharityPage() {
             <p className="mt-3 text-sm leading-7 text-slate-600">
               The goal is not to give you another technical system to learn. The goal is to help your team claim more and worry less.
             </p>
-            <Image src="/undraw_security-on_3ykb.svg" alt="" width={200} height={130} className="mt-6 h-32 w-auto" aria-hidden />
           </div>
           <ul className="grid gap-3">
             {benefits.map((benefit) => (
