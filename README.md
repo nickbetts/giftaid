@@ -9,6 +9,7 @@ This repository now includes a working foundation:
 - CSV parsing, validation, and upload summaries.
 - Claim creation from uploaded rows.
 - HMRC submission stub with persisted claim status updates.
+- Anthropic-backed upload guidance for plain-language next steps.
 - Prisma schema for tenancy, ingestion, claims, AI events, and audit logs.
 
 ## Stack
@@ -59,6 +60,7 @@ npm run dev
 - /api/claims/create: Claim creation from saved uploads.
 - /api/ingestion/preflight: Deterministic risk scoring endpoint.
 - /api/claims/submit: Persisted HMRC submission stub.
+- /api/ai/upload-guidance: Plain-language upload guidance powered by Anthropic.
 
 ## Database Commands
 
@@ -70,6 +72,8 @@ npm run db:push
 If Prisma cannot find DATABASE_URL, make sure .env exists and includes the values pulled from Vercel.
 
 Blob storage is optional in the current code path. If BLOB_READ_WRITE_TOKEN is present, uploaded CSV content is stored in Vercel Blob. Without it, the app falls back to an inline storage marker while still persisting upload metadata and parsed rows in Neon.
+
+Anthropic is used server-side only. Set ANTHROPIC_API_KEY and optionally ANTHROPIC_MODEL in Vercel and your local env files before using upload guidance.
 
 ## Next Build Steps
 

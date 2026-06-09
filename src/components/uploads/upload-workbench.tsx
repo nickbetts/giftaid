@@ -33,6 +33,14 @@ type UploadResponse = {
   };
 };
 
+type GuidanceResponse = {
+  summary: string;
+  nextSteps: string[];
+  donorDataAdvice: string[];
+  confidenceNote: string;
+  model: string;
+};
+
 const sampleCsv = `donationReference,donationDate,grossAmount,donorFirstName,donorLastName,donorPostcode,donorHouseNameOrNumber
 DON-1001,2026-05-01,25.00,Alice,Smith,SW1A 1AA,10
 DON-1002,2026-05-03,40.00,David,Jones,BS1 4DJ,22
@@ -44,8 +52,10 @@ export function UploadWorkbench() {
   const [csvText, setCsvText] = useState(sampleCsv);
   const [uploads, setUploads] = useState<UploadRecord[]>([]);
   const [result, setResult] = useState<UploadResponse | null>(null);
+  const [guidance, setGuidance] = useState<GuidanceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [guidanceLoading, setGuidanceLoading] = useState(false);
 
   const loadUploads = async () => {
     const response = await fetch("/api/uploads", { cache: "no-store" });
@@ -75,6 +85,7 @@ export function UploadWorkbench() {
   const submitUpload = async () => {
     setLoading(true);
     setError(null);
+    setGuidance(null);
 
     const response = await fetch("/api/uploads", {
       method: "POST",
@@ -94,6 +105,36 @@ export function UploadWorkbench() {
     setResult(data as UploadResponse);
     setLoading(false);
     await loadUploads();
+  };
+
+  const loadGuidance = async () => {
+    if (!result) {
+      return;
+    }
+
+    setGuidanceLoading(true);
+    setError(null);
+
+    const response = await fetch("/api/ai/upload-guidance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fileName: result.upload.fileName,
+        sourceSystem: result.upload.sourceSystem,
+        ...result.summary,
+      }),
+    });
+
+    const data = (await response.json()) as GuidanceResponse | { error: string };
+
+    if (!response.ok) {
+      setError("error" in data ? data.error : "Unable to load guidance.");
+      setGuidanceLoading(false);
+      return;
+    }
+
+    setGuidance(data as GuidanceResponse);
+    setGuidanceLoading(false);
   };
 
   return (
@@ -145,7 +186,17 @@ export function UploadWorkbench() {
 
       {result ? (
         <section className="rounded-3xl border border-slate-200 bg-white/90 p-6">
-          <h2 className="text-xl font-semibold text-slate-900">Latest upload summary</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-slate-900">Latest upload summary</h2>
+            <button
+              type="button"
+              onClick={() => void loadGuidance()}
+              disabled={guidanceLoading}
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {guidanceLoading ? "Preparing guidance..." : "Get next steps"}
+            </button>
+          </div>
           <div className="mt-4 grid gap-4 md:grid-cols-4">
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rows parsed</p>
@@ -171,6 +222,40 @@ export function UploadWorkbench() {
               </li>
             ))}
           </ul>
+
+          {guidance ? (
+            <div className="mt-6 grid gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Suggested next steps</h3>
+                <p className="mt-2 text-sm leading-7 text-slate-700">{guidance.summary}</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">What to do next</p>
+                  <ul className="mt-2 grid gap-2">
+                    {guidance.nextSteps.map((item) => (
+                      <li key={item} className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm text-slate-700">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Donor data checks</p>
+                  <ul className="mt-2 grid gap-2">
+                    {guidance.donorDataAdvice.map((item) => (
+                      <li key={item} className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm text-slate-700">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-700">{guidance.confidenceNote}</p>
+            </div>
+          ) : null}
         </section>
       ) : null}
 
