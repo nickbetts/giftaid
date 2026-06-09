@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+  <EnvelopeVersion>2.0</EnvelopeVersion>
+  <Header>
+    <MessageDetails>
+      <Class>HMRC-CHAR-CLM</Class>
+      <Qualifier>response</Qualifier>
+      <Function>delete</Function>
+      <TransactionID></TransactionID>
+      <CorrelationID>B7C59C4DCBE353CFB44E36FD23085216</CorrelationID>
+      <ResponseEndPoint PollInterval="10">https://secure.dev.gateway.gov.uk/poll</ResponseEndPoint>
+      <GatewayTimestamp>2015-05-01T12:00:48.908</GatewayTimestamp>
+    </MessageDetails>
+    <SenderDetails/>
+  </Header>
+  <GovTalkDetails>
+    <Keys/>
+  </GovTalkDetails>
+  <Body/>
+</GovTalkMessage>

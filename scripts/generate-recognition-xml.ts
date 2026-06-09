@@ -129,7 +129,6 @@ const xml = buildR68Xml({
     authorisedOfficialSurname: "Smith",
     authorisedOfficialPostcode: "AB12 3CD",
     authorisedOfficialPhone: "01234567890",
-    contactEmail: "bob.smith@aFundraisingOrganisation.org",
   },
   periodEnd: "2015-04-05",
   donations,
@@ -144,6 +143,7 @@ const xml = buildR68Xml({
   repaymentAdjustmentPence: 5000, // £50.00 adjustment to repayment claim
   gasds,
   isTest: true,
+  authMethod: "clear",
   gatewayUsername: "RECOGNITION_TEST",
   gatewayPassword: "RECOGNITION_TEST",
   // Adjustment explanations are required by HMRC business rules when any adjustment is present

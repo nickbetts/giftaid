@@ -6,7 +6,7 @@
       <Class>HMRC-CHAR-CLM</Class>
       <Qualifier>request</Qualifier>
       <Function>submit</Function>
-      <CorrelationID/>
+      <CorrelationID>A3B48B3CBAD242BEB33D25EC12974105</CorrelationID>
       <Transformation>XML</Transformation>
       <GatewayTest>1</GatewayTest>
       <GatewayTimestamp>2015-05-01T12:00:00</GatewayTimestamp>
@@ -84,7 +84,7 @@
           <Donor>
           <Fore>Jim</Fore>
           <Sur>Harris</Sur>
-          <House>19 The Promenade, Benidorm</House>
+          <House>19 The Promenade, Benidorm, Spain</House>
           <Overseas>yes</Overseas>
         </Donor>
           <Date>2015-04-15</Date>

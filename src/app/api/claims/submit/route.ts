@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
       authorisedOfficialSurname: process.env.HMRC_OFFICIAL_SURNAME ?? "User",
       authorisedOfficialPostcode: process.env.HMRC_OFFICIAL_POSTCODE ?? "",
       authorisedOfficialPhone: process.env.HMRC_OFFICIAL_PHONE ?? "01234567890",
-      contactEmail: process.env.HMRC_CONTACT_EMAIL ?? "admin@example.com",
     },
     donations: donationRows.map((row) => ({
       donorTitle: row.donorTitle,

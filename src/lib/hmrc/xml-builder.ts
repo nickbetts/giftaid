@@ -21,7 +21,6 @@ export type CharityXmlInfo = {
   /** UK postcode of the authorised official, used to identify them to HMRC. */
   authorisedOfficialPostcode: string;
   authorisedOfficialPhone: string;
-  contactEmail: string;
 };
 
 /**
@@ -119,6 +118,13 @@ export type R68BuildInput = {
    * Required by HMRC recognition test data: pass "2015-05-01T12:00:00".
    */
   gatewayTimestamp?: string;
+  /**
+   * Authentication method for the GovTalk SenderDetails block.
+   * "clear" is used with LTS / ISV Reflector (recognition testing).
+   * "UserNameToken" is used with the live and test Transaction Engine.
+   * Defaults to "UserNameToken".
+   */
+  authMethod?: "clear" | "UserNameToken";
 };
 
 function escapeXml(value: string): string {
@@ -267,6 +273,7 @@ export function buildR68Xml(input: R68BuildInput): string {
     gatewayUsername,
     gatewayPassword,
     gatewayTimestamp,
+    authMethod = "UserNameToken",
   } = input;
 
   if (donations.length === 0) {
@@ -349,19 +356,20 @@ export function buildR68Xml(input: R68BuildInput): string {
       <IDAuthentication>
         <SenderID>${escapeXml(gatewayUsername)}</SenderID>
         <Authentication>
-          <Method>UserNameToken</Method>
+          <Method>${authMethod}</Method>
           <Role>principal</Role>
           <Value>${escapeXml(gatewayPassword)}</Value>
         </Authentication>
       </IDAuthentication>
-      <EmailAddress>${escapeXml(charity.contactEmail)}</EmailAddress>
     </SenderDetails>
   </Header>
   <GovTalkDetails>
     <Keys>
-      <Key Type="CHARITIESREF">${escapeXml(charity.hmrcReference)}</Key>
       <Key Type="CHARID">${escapeXml(charity.hmrcReference)}</Key>
     </Keys>
+    <TargetDetails>
+      <Organisation>HMRC</Organisation>
+    </TargetDetails>
     <ChannelRouting>
       <Channel>
         <URI>https://givta.co.uk</URI>
@@ -374,7 +382,7 @@ export function buildR68Xml(input: R68BuildInput): string {
     <IRenvelope xmlns="http://www.govtalk.gov.uk/taxation/charities/r68/2">
       <IRheader>
         <Keys>
-          <Key Type="CHARITIESREF">${escapeXml(charity.hmrcReference)}</Key>
+          <Key Type="CHARID">${escapeXml(charity.hmrcReference)}</Key>
         </Keys>
         <PeriodEnd>${escapeXml(periodEnd)}</PeriodEnd>
         <DefaultCurrency>GBP</DefaultCurrency>
