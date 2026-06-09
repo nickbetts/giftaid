@@ -2,12 +2,14 @@
 
 AI-first Gift Aid operations platform for UK charities.
 
-This repository now includes the first implementation slice:
+This repository now includes a working foundation:
 
-- Modern marketing and product shell pages.
-- Upload preflight workflow and scoring API.
-- Claim submission queue API stub.
-- Initial Prisma schema for tenancy, ingestion, claims, AI events, and audit logs.
+- Charity-friendly marketing pages.
+- Neon-backed donation upload persistence.
+- CSV parsing, validation, and upload summaries.
+- Claim creation from uploaded rows.
+- HMRC submission stub with persisted claim status updates.
+- Prisma schema for tenancy, ingestion, claims, AI events, and audit logs.
 
 ## Stack
 
@@ -49,11 +51,14 @@ npm run dev
 - /: Charity-friendly marketing home page.
 - /charity: Core charity onboarding and benefits page.
 - /charity/claim: Gift Aid claim submission flow page.
-- /dashboard: Operations cockpit preview.
-- /upload: Preflight scoring playground connected to API.
-- /claims: Claim queue and confidence view.
+- /dashboard: Live Neon-backed operations cockpit.
+- /upload: Live upload validation and persistence flow.
+- /claims: Live claim creation and submission workspace.
+- /api/uploads: Upload persistence and row ingestion.
+- /api/claims: Claim listing.
+- /api/claims/create: Claim creation from saved uploads.
 - /api/ingestion/preflight: Deterministic risk scoring endpoint.
-- /api/claims/submit: Submission enqueue endpoint (stub).
+- /api/claims/submit: Persisted HMRC submission stub.
 
 ## Database Commands
 
@@ -64,10 +69,12 @@ npm run db:push
 
 If Prisma cannot find DATABASE_URL, make sure .env exists and includes the values pulled from Vercel.
 
+Blob storage is optional in the current code path. If BLOB_READ_WRITE_TOKEN is present, uploaded CSV content is stored in Vercel Blob. Without it, the app falls back to an inline storage marker while still persisting upload metadata and parsed rows in Neon.
+
 ## Next Build Steps
 
-1. Wire authentication and charity tenancy.
-2. Implement secure file uploads and ingestion worker.
-3. Connect claim builder to HMRC submission adapter.
-4. Persist preflight and submission events in database.
-5. Add AI prompt orchestration with redaction and audit evidence.
+1. Replace the HMRC submission stub with the real API adapter and auth flow.
+2. Add authentication and charity-level access control.
+3. Move file upload from pasted CSV to direct file picker and signed Blob upload flow.
+4. Add AI-assisted row repair and eligibility explanations.
+5. Add audit views and operational exception handling.
