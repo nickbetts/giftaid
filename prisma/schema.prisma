@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UploadStatus {
+  PENDING
+  VALIDATING
+  READY
+  FAILED
+}
+
+enum ClaimStatus {
+  DRAFT
+  READY
+  QUEUED
+  SUBMITTED
+  FAILED
+  REQUIRES_REVIEW
+}
+
+enum AuditEventType {
+  INGESTION_CREATED
+  INGESTION_VALIDATED
+  CLAIM_CREATED
+  CLAIM_SUBMITTED
+  CLAIM_RESPONSE_RECEIVED
+  AI_SUGGESTION_GENERATED
+}
+
+model Charity {
+  id                 String           @id @default(cuid())
+  name               String
+  hmrcReference      String?          @unique
+  timezone           String           @default("Europe/London")
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  users              User[]
+  uploads            DonationUpload[]
+  claims             Claim[]
+  aiEvents           AiEvent[]
+  auditEvents        AuditEvent[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  charityId     String
+  email         String    @unique
+  displayName   String?
+  role          String
+  lastActiveAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  charity       Charity   @relation(fields: [charityId], references: [id], onDelete: Cascade)
+}
+
+model DonationUpload {
+  id                 String           @id @default(cuid())
+  charityId          String
+  fileName           String
+  fileStoragePath    String
+  sourceSystem       String?
+  status             UploadStatus     @default(PENDING)
+  rowCount           Int              @default(0)
+  parseErrors        Json?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  charity            Charity          @relation(fields: [charityId], references: [id], onDelete: Cascade)
+  rows               DonationRow[]
+  claims             Claim[]
+
+  @@index([charityId, status])
+}
+
+model DonationRow {
+  id                      String   @id @default(cuid())
+  uploadId                String
+  donationReference       String
+  donationDate            DateTime
+  grossAmountPence        Int
+  donorTitle              String?
+  donorFirstName          String?
+  donorLastName           String?
+  donorPostcode           String?
+  donorHouseNameOrNumber  String?
+  eligible                Boolean?
+  validationMessages      Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  upload                  DonationUpload @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+
+  @@index([uploadId, donationReference])
+}
+
+model Claim {
+  id                  String        @id @default(cuid())
+  charityId           String
+  uploadId            String?
+  claimReference      String        @unique
+  hmrcSubmissionId    String?
+  taxYear             String
+  status              ClaimStatus   @default(DRAFT)
+  confidenceScore     Int?
+  estimatedAidPence   Int
+  submittedAt         DateTime?
+  responsePayload     Json?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  charity             Charity       @relation(fields: [charityId], references: [id], onDelete: Cascade)
+  upload              DonationUpload? @relation(fields: [uploadId], references: [id], onDelete: SetNull)
+  claimItems          ClaimItem[]
+  auditEvents         AuditEvent[]
+
+  @@index([charityId, status])
+}
+
+model ClaimItem {
+  id                   String   @id @default(cuid())
+  claimId              String
+  donationRowId        String
+  aidAmountPence       Int
+  isEligible           Boolean
+  ineligibleReason     String?
+  createdAt            DateTime @default(now())
+  claim                Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@index([claimId])
+}
+
+model AiEvent {
+  id                String   @id @default(cuid())
+  charityId         String
+  actorUserId       String?
+  feature           String
+  promptRedacted    String
+  outputSummary     String
+  confidenceScore   Int?
+  createdAt         DateTime @default(now())
+  charity           Charity  @relation(fields: [charityId], references: [id], onDelete: Cascade)
+
+  @@index([charityId, feature])
+}
+
+model AuditEvent {
+  id              String         @id @default(cuid())
+  charityId       String
+  claimId         String?
+  eventType       AuditEventType
+  eventPayload    Json
+  createdAt       DateTime       @default(now())
+  charity         Charity         @relation(fields: [charityId], references: [id], onDelete: Cascade)
+  claim           Claim?          @relation(fields: [claimId], references: [id], onDelete: SetNull)
+
+  @@index([charityId, eventType])
+  @@index([claimId])
+}
