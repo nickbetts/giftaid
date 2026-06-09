@@ -146,6 +146,9 @@ const xml = buildR68Xml({
   isTest: true,
   gatewayUsername: "RECOGNITION_TEST",
   gatewayPassword: "RECOGNITION_TEST",
+  // Adjustment explanations are required by HMRC business rules when any adjustment is present
+  otherInfo:
+    "Repayment adjustment of £50 to correct previous submission. GASDS adjustment of £25 to correct previous GASDS claim.",
   // Per HMRC test instructions: set submission date to 01/05/2015
   gatewayTimestamp: "2015-05-01T12:00:00",
 });

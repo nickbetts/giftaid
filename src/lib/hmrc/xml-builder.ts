@@ -103,6 +103,11 @@ export type R68BuildInput = {
   repaymentAdjustmentPence?: number;
   gasds?: GasdsInput;
   /**
+   * Free-text note for the claim (max 350 chars).  Required by HMRC business rules
+   * whenever a Repayment Adjustment or GASDS Adjustment is included.
+   */
+  otherInfo?: string;
+  /**
    * 1 = test submission (GatewayTest flag set), 0 = live.
    * When submitting to the LTS or test-transaction-engine, always pass true.
    */
@@ -257,6 +262,7 @@ export function buildR68Xml(input: R68BuildInput): string {
     otherIncome,
     repaymentAdjustmentPence,
     gasds,
+    otherInfo,
     isTest,
     gatewayUsername,
     gatewayPassword,
@@ -319,6 +325,10 @@ export function buildR68Xml(input: R68BuildInput): string {
 
   const gasdsXml = gasds ? buildGasdsXml(gasds) : "";
 
+  const otherInfoXml = otherInfo
+    ? `\n          <OtherInfo>${escapeXml(otherInfo.slice(0, 350))}</OtherInfo>`
+    : "";
+
   const timestampXml = gatewayTimestamp
     ? `\n      <GatewayTimestamp>${escapeXml(gatewayTimestamp)}</GatewayTimestamp>`
     : "";
@@ -350,6 +360,7 @@ export function buildR68Xml(input: R68BuildInput): string {
   <GovTalkDetails>
     <Keys>
       <Key Type="CHARITIESREF">${escapeXml(charity.hmrcReference)}</Key>
+      <Key Type="CHARID">${escapeXml(charity.hmrcReference)}</Key>
     </Keys>
     <ChannelRouting>
       <Channel>
@@ -386,7 +397,7 @@ export function buildR68Xml(input: R68BuildInput): string {
           <OrgName>${escapeXml(charity.orgName)}</OrgName>
           <HMRCref>${escapeXml(charity.hmrcReference)}</HMRCref>${regulatorXml}
           <Repayment>${gadsXml}${earliestGADateXml}${otherIncXml}${adjustmentXml}
-          </Repayment>${gasdsXml}
+          </Repayment>${gasdsXml}${otherInfoXml}
         </Claim>
       </R68>
     </IRenvelope>
