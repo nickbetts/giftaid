@@ -13,8 +13,8 @@ const groups = [
     title: "Try it",
     links: [
       { href: "/upload", label: "Free file check" },
-      { href: "/claims", label: "Claim workspace" },
-      { href: "/dashboard", label: "Live dashboard" },
+      { href: "/app/claims", label: "Claim workspace" },
+      { href: "/app/dashboard", label: "Live dashboard" },
     ],
   },
   {

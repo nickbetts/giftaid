@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type UploadRecord = {
   id: string;
@@ -46,16 +46,22 @@ DON-1001,2026-05-01,25.00,Alice,Smith,SW1A 1AA,10
 DON-1002,2026-05-03,40.00,David,Jones,BS1 4DJ,22
 DON-1003,2026-05-07,18.50,Rachel,Taylor,LS1 2AB,4A`;
 
+function confidenceLabel(score: number) {
+  if (score >= 80) return "High";
+  if (score >= 50) return "Good";
+  return "Needs work";
+}
+
 export function UploadWorkbench() {
-  const [fileName, setFileName] = useState("spring-appeal.csv");
+  const [dragActive, setDragActive] = useState(false);
   const [sourceSystem, setSourceSystem] = useState("Fundraising CRM");
-  const [csvText, setCsvText] = useState(sampleCsv);
   const [uploads, setUploads] = useState<UploadRecord[]>([]);
   const [result, setResult] = useState<UploadResponse | null>(null);
   const [guidance, setGuidance] = useState<GuidanceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [guidanceLoading, setGuidanceLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const loadUploads = async () => {
     const response = await fetch("/api/uploads", { cache: "no-store" });
@@ -65,150 +71,181 @@ export function UploadWorkbench() {
 
   useEffect(() => {
     let cancelled = false;
-
     const bootstrap = async () => {
       const response = await fetch("/api/uploads", { cache: "no-store" });
       const data = (await response.json()) as { uploads: UploadRecord[] };
-
-      if (!cancelled) {
-        setUploads(data.uploads);
-      }
+      if (!cancelled) setUploads(data.uploads);
     };
-
     void bootstrap();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  const submitUpload = async () => {
-    setLoading(true);
-    setError(null);
-    setGuidance(null);
-
-    const response = await fetch("/api/uploads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileName, sourceSystem, csvText }),
-    });
-
-    const data = (await response.json()) as UploadResponse | { error: string };
-
-    if (!response.ok) {
-      setError("error" in data ? data.error : "Upload failed.");
-      setLoading(false);
-      await loadUploads();
-      return;
-    }
-
-    setResult(data as UploadResponse);
-    setLoading(false);
-    await loadUploads();
-  };
-
-  const loadGuidance = async () => {
-    if (!result) {
-      return;
-    }
-
+  const loadGuidance = useCallback(async (uploadResult: UploadResponse) => {
     setGuidanceLoading(true);
     setError(null);
-
     const response = await fetch("/api/ai/upload-guidance", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        fileName: result.upload.fileName,
-        sourceSystem: result.upload.sourceSystem,
-        ...result.summary,
+        fileName: uploadResult.upload.fileName,
+        sourceSystem: uploadResult.upload.sourceSystem,
+        ...uploadResult.summary,
       }),
     });
-
     const data = (await response.json()) as GuidanceResponse | { error: string };
-
     if (!response.ok) {
       setError("error" in data ? data.error : "Unable to load guidance.");
-      setGuidanceLoading(false);
+    } else {
+      setGuidance(data as GuidanceResponse);
+    }
+    setGuidanceLoading(false);
+  }, []);
+
+  const submitUpload = useCallback(async (text: string, name: string) => {
+    setLoading(true);
+    setError(null);
+    setGuidance(null);
+    setResult(null);
+
+    const response = await fetch("/api/uploads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fileName: name, sourceSystem, csvText: text }),
+    });
+
+    const data = (await response.json()) as UploadResponse | { error: string };
+    await loadUploads();
+
+    if (!response.ok) {
+      setError("error" in data ? data.error : "Upload failed.");
+      setLoading(false);
       return;
     }
 
-    setGuidance(data as GuidanceResponse);
-    setGuidanceLoading(false);
-  };
+    const uploadResult = data as UploadResponse;
+    setResult(uploadResult);
+    setLoading(false);
+    void loadGuidance(uploadResult);
+  }, [sourceSystem, loadGuidance]);
+
+  const handleFile = useCallback(async (file: File) => {
+    const text = await file.text();
+    await submitUpload(text, file.name);
+  }, [submitUpload]);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+    const file = e.dataTransfer.files[0];
+    if (file) void handleFile(file);
+  }, [handleFile]);
+
+  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) void handleFile(file);
+  }, [handleFile]);
 
   return (
     <div className="grid gap-6">
-      <section className="grid gap-4 rounded-3xl border border-slate-200 bg-white/90 p-6 md:grid-cols-2">
-        <label className="grid gap-2 text-sm font-medium text-slate-700">
-          File name
-          <input
-            className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:ring-2 focus:ring-brand"
-            value={fileName}
-            onChange={(event) => setFileName(event.target.value)}
-          />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-700">
-          Source system
-          <input
-            className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:ring-2 focus:ring-brand"
-            value={sourceSystem}
-            onChange={(event) => setSourceSystem(event.target.value)}
-          />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-700 md:col-span-2">
-          Donation file content
-          <textarea
-            className="min-h-72 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xs text-slate-800 outline-none transition focus:ring-2 focus:ring-brand"
-            value={csvText}
-            onChange={(event) => setCsvText(event.target.value)}
-          />
-        </label>
-        <div className="md:col-span-2 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={submitUpload}
-            disabled={loading}
-            className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+      {/* Drop zone */}
+      {!result ? (
+        <section className="grid gap-4 rounded-3xl border border-slate-200 bg-white/90 p-6">
+          <label className="grid gap-2 text-sm font-medium text-slate-700">
+            Source system (CRM or fundraising platform name)
+            <input
+              className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:ring-2 focus:ring-brand"
+              value={sourceSystem}
+              onChange={(e) => setSourceSystem(e.target.value)}
+            />
+          </label>
+
+          <div
+            onDragEnter={() => setDragActive(true)}
+            onDragLeave={() => setDragActive(false)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={() => inputRef.current?.click()}
+            className={`flex min-h-56 cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed p-10 text-center transition ${
+              dragActive
+                ? "border-brand bg-brand/5"
+                : "border-slate-300 bg-slate-50 hover:border-brand/60 hover:bg-brand/5"
+            }`}
           >
-            {loading ? "Processing upload..." : "Validate and save upload"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setCsvText(sampleCsv)}
-            className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand"
-          >
-            Reset sample template
-          </button>
-        </div>
-        {error ? <p className="md:col-span-2 text-sm font-medium text-rose-700">{error}</p> : null}
-      </section>
+            <input
+              ref={inputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileInput}
+            />
+            {loading ? (
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand/20 border-t-brand" />
+                <p className="text-sm font-medium text-slate-600">Uploading and validating…</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <svg className="h-6 w-6 text-brand" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16v2a2 2 0 002 2h14a2 2 0 002-2v-2M16 8l-4-4-4 4M12 4v12" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-base font-semibold text-slate-900">
+                    {dragActive ? "Drop to start validating" : "Drop your CSV here or click to browse"}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">givta checks every row and prepares a claim automatically</p>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                const blob = new Blob([sampleCsv], { type: "text/csv" });
+                const fakeFile = new File([blob], "sample-donations.csv", { type: "text/csv" });
+                void handleFile(fakeFile);
+              }}
+              disabled={loading}
+              className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand disabled:opacity-60"
+            >
+              Try with sample data
+            </button>
+          </div>
+
+          {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+        </section>
+      ) : null}
 
       {result ? (
         <section className="rounded-3xl border border-slate-200 bg-white/90 p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl font-semibold text-slate-900">Latest upload summary</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">{result.upload.fileName}</h2>
+              <p className="text-sm text-slate-500">{result.upload.sourceSystem ?? "Unknown source"}</p>
+            </div>
             <button
               type="button"
-              onClick={() => void loadGuidance()}
-              disabled={guidanceLoading}
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={() => { setResult(null); setGuidance(null); }}
+              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand"
             >
-              {guidanceLoading ? "Preparing guidance..." : "Get next steps"}
+              Upload another file
             </button>
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-4">
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rows parsed</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Rows checked</p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">{result.summary.rowCount}</p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Eligible rows</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Eligible donations</p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">{result.summary.eligibleRowCount}</p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Confidence</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">{result.summary.confidenceScore}%</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">{confidenceLabel(result.summary.confidenceScore)}</p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Risk band</p>
@@ -222,6 +259,13 @@ export function UploadWorkbench() {
               </li>
             ))}
           </ul>
+
+          {guidanceLoading ? (
+            <div className="mt-6 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand/30 border-t-brand" />
+              <p className="text-sm text-slate-600">Preparing personalised guidance…</p>
+            </div>
+          ) : null}
 
           {guidance ? (
             <div className="mt-6 grid gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5">

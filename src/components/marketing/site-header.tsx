@@ -12,7 +12,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-teal-900/10 bg-white/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 md:px-10">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/givta.svg" alt="givta" width={110} height={60} className="h-9 w-auto" priority />
+          <Image src="/givta.svg" alt="givta" width={140} height={76} className="h-12 w-auto" priority />
           <span className="text-sm font-semibold tracking-[0.18em] text-slate-500 uppercase">Gift Aid made simple</span>
         </Link>
         <nav className="hidden items-center gap-6 md:flex">
