@@ -25,10 +25,15 @@ This repository now includes the first implementation slice:
 npm install
 ```
 
-2. Copy environment variables.
+2. Link to the Vercel project and pull environment variables.
 
 ```bash
-cp .env.example .env.local
+vercel link --scope i3medias-projects --project giftaid --yes
+```
+
+```bash
+vercel env pull .env.local
+cp .env.local .env
 ```
 
 3. Start development server.
@@ -41,12 +46,23 @@ npm run dev
 
 ## Implemented Routes
 
-- /: Landing page for product direction.
+- /: Charity-friendly marketing home page.
+- /charity: Core charity onboarding and benefits page.
+- /charity/claim: Gift Aid claim submission flow page.
 - /dashboard: Operations cockpit preview.
 - /upload: Preflight scoring playground connected to API.
 - /claims: Claim queue and confidence view.
 - /api/ingestion/preflight: Deterministic risk scoring endpoint.
 - /api/claims/submit: Submission enqueue endpoint (stub).
+
+## Database Commands
+
+```bash
+npm run db:generate
+npm run db:push
+```
+
+If Prisma cannot find DATABASE_URL, make sure .env exists and includes the values pulled from Vercel.
 
 ## Next Build Steps
 
