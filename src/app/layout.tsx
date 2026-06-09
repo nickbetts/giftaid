@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Mono, Manrope, Newsreader } from "next/font/google";
 import "./globals.css";
 
-const brandSans = Space_Grotesk({
+const brandSans = Manrope({
   variable: "--font-brand-sans",
   subsets: ["latin"],
 });
 
-const brandMono = JetBrains_Mono({
-  variable: "--font-brand-mono",
+const brandDisplay = Newsreader({
+  variable: "--font-brand-display",
   subsets: ["latin"],
 });
 
+const brandMono = IBM_Plex_Mono({
+  variable: "--font-brand-mono",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
-  title: "GiftAid OS",
+  title: "givta",
   description:
-    "AI-first Gift Aid platform for faster submission, cleaner data, and transparent HMRC claim operations.",
+    "givta helps charities recover more Gift Aid with less admin, plain-English guidance, and a simple 3% flat commission.",
 };
 
 export default function RootLayout({
@@ -26,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${brandSans.variable} ${brandMono.variable} h-full antialiased`}
+      className={`${brandSans.variable} ${brandDisplay.variable} ${brandMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

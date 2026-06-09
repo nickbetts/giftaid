@@ -4,28 +4,28 @@ import { SiteHeader } from "@/components/marketing/site-header";
 
 const flow = [
   {
-    title: "Register your team",
-    body: "Set up your charity workspace and choose who can approve submissions.",
+    title: "Create your givta workspace",
+    body: "Get your charity set up and decide who should review and approve claims.",
   },
   {
-    title: "Download the template",
-    body: "Use the standard format to avoid avoidable errors and speed up checks.",
+    title: "Use the simple template",
+    body: "If you need it, download a clean template that makes common errors less likely.",
   },
   {
     title: "Upload your donation file",
-    body: "Submit CSV or ODS records through a secure upload process.",
+    body: "Send through CSV or ODS records securely and let givta run the first checks.",
   },
   {
-    title: "Run data checks",
-    body: "We highlight ineligible rows and suggest simple fixes in plain language.",
+    title: "Fix what matters",
+    body: "We highlight ineligible rows and explain the changes in a way your team can act on quickly.",
   },
   {
     title: "Submit to HMRC",
-    body: "Approved claims are queued and submitted with idempotent tracking.",
+    body: "Approved claims move through one clear submission flow with tracking you can follow.",
   },
   {
-    title: "Track outcomes",
-    body: "Follow status updates and keep complete evidence for internal review.",
+    title: "Keep a clean record",
+    body: "See what was sent, what changed, and what came back without piecing together separate tools.",
   },
 ];
 
@@ -37,27 +37,27 @@ export default function ClaimPage() {
         <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white/90 p-8 md:grid-cols-[1.2fr_1fr] md:p-12">
           <div>
             <p className="inline-flex rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand">
-              Claim submissions
+              Claims made simple
             </p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 md:text-5xl">
-              A clearer claim submission journey from start to finish
+              A clear path from donation file to submitted claim
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-600">
-              No confusing handoffs. No hidden steps. Your team can follow one guided path from file prep to final submission.
+              No confusing handoffs and no mystery steps. givta keeps the whole process organised so your team can move faster with less stress.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/upload" className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-700">
-                Open upload preflight
+                Start with a free file check
               </Link>
               <Link href="/claims" className="rounded-full border border-brand/40 bg-white px-5 py-3 text-sm font-semibold text-brand transition hover:border-brand">
-                Open command center
+                Open the claim workspace
               </Link>
             </div>
           </div>
           <aside className="rounded-2xl border border-brand/20 bg-brand-deep p-6 text-white">
-            <p className="text-xs font-semibold uppercase tracking-wider text-teal-200">Success based pricing model</p>
-            <p className="mt-3 text-3xl font-semibold">5% + VAT</p>
-            <p className="mt-2 text-sm text-teal-100">Applied to processed Gift Aid so costs stay aligned with outcomes.</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-teal-200">Simple pricing</p>
+            <p className="mt-3 text-3xl font-semibold">3% flat commission</p>
+            <p className="mt-2 text-sm text-teal-100">A low, clear rate tied to processed claims so you keep more of the income you recover.</p>
           </aside>
         </section>
 

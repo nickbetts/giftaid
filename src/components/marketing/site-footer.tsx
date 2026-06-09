@@ -2,19 +2,19 @@ import Link from "next/link";
 
 const groups = [
   {
-    title: "Charities",
+    title: "Learn",
     links: [
       { href: "/charity", label: "How it works" },
-      { href: "/charity/claim", label: "Claim submissions" },
-      { href: "/dashboard", label: "Dashboard preview" },
+      { href: "/charity/claim", label: "Pricing" },
+      { href: "/", label: "Why charities switch" },
     ],
   },
   {
-    title: "Resources",
+    title: "Try it",
     links: [
-      { href: "/upload", label: "Upload preflight" },
-      { href: "/claims", label: "Claim command center" },
-      { href: "/", label: "Home" },
+      { href: "/upload", label: "Free file check" },
+      { href: "/claims", label: "Claim workspace" },
+      { href: "/dashboard", label: "Live dashboard" },
     ],
   },
   {
@@ -32,10 +32,9 @@ export function SiteFooter() {
     <footer className="border-t border-teal-900/10 bg-white/80">
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-5 py-12 md:grid-cols-[1.2fr_2fr] md:px-10">
         <div>
-          <p className="text-lg font-semibold text-slate-900">Helping charities recover every eligible pound</p>
+          <p className="text-lg font-semibold text-slate-900">givta helps charities claim more with less admin</p>
           <p className="mt-3 max-w-md text-sm leading-7 text-slate-600">
-            GiftAid OS is being built for finance and fundraising teams who want a simpler way to submit claims and stay
-            fully compliant.
+            Built for busy fundraising and finance teams who want a calm, clear way to recover Gift Aid and keep every step tidy.
           </p>
         </div>
         <div className="grid gap-8 sm:grid-cols-3">
