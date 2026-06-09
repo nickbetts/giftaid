@@ -32,14 +32,17 @@ const steps = [
   {
     title: "Send your file",
     body: "Upload your donation data from the system you already use. CSV and ODS both work.",
+    illustration: "/undraw_drag-to-add_8zdg.svg",
   },
   {
     title: "Fix the easy wins",
     body: "givta checks the data, flags issues, and explains what needs changing in simple language.",
+    illustration: "/undraw_file-searching_yska.svg",
   },
   {
     title: "Claim with confidence",
     body: "Approve the final claim, send it on, and keep a clean record of everything in one place.",
+    illustration: "/undraw_document-ready_o5d5.svg",
   },
 ];
 
@@ -94,7 +97,8 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-brand/20 bg-brand-deep p-6 text-white shadow-lg shadow-brand-deep/30">
               <Image src="/givta.svg" alt="givta logo" width={160} height={87} className="h-auto w-32" priority />
-              <p className="mt-5 text-sm font-semibold uppercase tracking-wider text-teal-200">Why teams switch</p>
+              <Image src="/undraw_gift-joy_kqz4.svg" alt="" width={220} height={145} className="mt-5 h-32 w-auto opacity-90" aria-hidden />
+              <p className="mt-4 text-sm font-semibold uppercase tracking-wider text-teal-200">Why teams switch</p>
               <p className="mt-3 text-2xl font-semibold">They stop wrestling spreadsheets and start recovering income faster.</p>
               <p className="mt-3 text-sm leading-6 text-teal-100">
                 givta keeps the process warm, simple, and well organised so finance and fundraising teams can work together without confusion.
@@ -137,7 +141,8 @@ export default function Home() {
           <div className="grid gap-4 md:grid-cols-3">
             {steps.map((step, index) => (
               <article key={step.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">0{index + 1}</p>
+                <Image src={step.illustration} alt="" width={120} height={80} className="h-20 w-auto" aria-hidden />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.22em] text-brand">0{index + 1}</p>
                 <h3 className="mt-3 text-lg font-semibold text-slate-900">{step.title}</h3>
                 <p className="mt-2 text-sm leading-7 text-slate-600">{step.body}</p>
               </article>
@@ -154,6 +159,7 @@ export default function Home() {
             </p>
           </div>
           <div className="rounded-2xl border border-white/15 bg-white/8 p-6">
+            <Image src="/undraw_budgeting_klon.svg" alt="" width={180} height={120} className="mb-5 h-28 w-auto opacity-90" aria-hidden />
             <p className="text-sm leading-7 text-teal-50/90">
               Good for teams that want to save time, avoid missed claims, and stop spending days chasing down data problems.
             </p>

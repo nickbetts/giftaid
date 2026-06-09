@@ -41,7 +41,8 @@ export default function LoginPage() {
           <Link href="/">
             <Image src="/givta.svg" alt="givta" width={140} height={76} className="h-12 w-auto" priority />
           </Link>
-          <h1 className="mt-6 text-2xl font-semibold text-slate-900">Welcome back</h1>
+          <Image src="/undraw_security-on_3ykb.svg" alt="" width={180} height={120} className="mt-6 h-28 w-auto" aria-hidden />
+          <h1 className="mt-5 text-2xl font-semibold text-slate-900">Welcome back</h1>
           <p className="mt-2 text-sm text-slate-600">Sign in to your charity workspace</p>
         </div>
 

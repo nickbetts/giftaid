@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatCurrencyFromPence, formatDateTime } from "@/lib/format";
 import { getOrCreateDefaultCharity } from "@/lib/server/default-charity";
+import Image from "next/image";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -62,6 +63,7 @@ export default async function AppDashboardPage() {
           </div>
         </div>
         <div className="rounded-2xl border border-brand/20 bg-gradient-to-br from-brand-deep to-brand p-6 text-white">
+          <Image src="/undraw_ai-data-extraction_soxc.svg" alt="" width={180} height={120} className="mb-4 h-24 w-auto opacity-90" aria-hidden />
           <p className="text-xs font-semibold uppercase tracking-widest text-teal-200">Workspace status</p>
           <p className="mt-3 text-2xl font-semibold">Connected to Neon</p>
           <p className="mt-2 text-sm text-teal-100">

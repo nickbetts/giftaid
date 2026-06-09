@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { SiteHeader } from "@/components/marketing/site-header";
@@ -34,23 +35,28 @@ export default function CharityPage() {
     <div className="flex flex-1 flex-col">
       <SiteHeader />
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-12 px-5 pb-20 pt-8 md:px-10">
-        <section className="rounded-3xl border border-teal-900/10 bg-white/90 p-8 shadow-lg shadow-teal-950/10 md:p-12">
-          <p className="inline-flex rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand">
-            For charity teams
-          </p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight text-slate-900 md:text-6xl">
-            Give your team a simpler way to recover Gift Aid
-          </h1>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
-            givta is built for the real pain points. Too much admin, too many spreadsheets, and too much time spent fixing avoidable claim issues.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/charity/claim" className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-700">
-              See pricing and claim flow
-            </Link>
-            <Link href="/upload" className="rounded-full border border-brand/40 bg-white px-5 py-3 text-sm font-semibold text-brand transition hover:border-brand">
-              Try a free file check
-            </Link>
+        <section className="grid gap-8 rounded-3xl border border-teal-900/10 bg-white/90 p-8 shadow-lg shadow-teal-950/10 md:grid-cols-[1.1fr_0.9fr] md:items-center md:p-12">
+          <div>
+            <p className="inline-flex rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand">
+              For charity teams
+            </p>
+            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight text-slate-900 md:text-6xl">
+              Give your team a simpler way to recover Gift Aid
+            </h1>
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-600">
+              givta is built for the real pain points. Too much admin, too many spreadsheets, and too much time spent fixing avoidable claim issues.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/charity/claim" className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-700">
+                See pricing and claim flow
+              </Link>
+              <Link href="/upload" className="rounded-full border border-brand/40 bg-white px-5 py-3 text-sm font-semibold text-brand transition hover:border-brand">
+                Try a free file check
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center justify-center">
+            <Image src="/undraw_certification_oqiz.svg" alt="" width={320} height={240} className="h-auto w-full max-w-[260px]" aria-hidden />
           </div>
         </section>
 
@@ -70,6 +76,7 @@ export default function CharityPage() {
             <p className="mt-3 text-sm leading-7 text-slate-600">
               The goal is not to give you another technical system to learn. The goal is to help your team claim more and worry less.
             </p>
+            <Image src="/undraw_security-on_3ykb.svg" alt="" width={200} height={130} className="mt-6 h-32 w-auto" aria-hidden />
           </div>
           <ul className="grid gap-3">
             {benefits.map((benefit) => (
